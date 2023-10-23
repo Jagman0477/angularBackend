@@ -9,6 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -23,21 +25,38 @@ import com.jagman.repository.PersonRepository;
 @RestController
 @RequestMapping("/api")
 public class PersonController {
-
+	
+	@Autowired
+	private BCryptPasswordEncoder bCryptPasswordEncoder;
+	
+	@Autowired
+	public PersonController(PasswordEncoder passwordEncoder) {
+		this.bCryptPasswordEncoder = bCryptPasswordEncoder;
+	}
+	
 	@Autowired
 	PersonRepository personRepository;
 	
 	@PostMapping("/register")
-	public String createNewPerson(@RequestBody Person person) {
-		if(!getUserByEmail(person.getUserEmail())) {
+	public ResponseEntity<String> createNewPerson(@RequestBody Person person) {
+		
+		// Check if user exists
+		if(getUserByEmail(person.getUserEmail()) == null) {
+			
+			// Hash user password
+			String hashPassword = bCryptPasswordEncoder.encode(person.getUserPassword());
+			person.setUserPassword(hashPassword);
+			
 			personRepository.save(person);
-			return "Person created in database";
+			return ResponseEntity.status(HttpStatus.CREATED).body("User created -> true");
 		}
-		return "Email already exists";
+		
+		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User created -> false");
 	}
 	
 	@GetMapping("/register")
 	public ResponseEntity<List<Person>> getAllUsers(){
+		System.out.println();
 		List<Person> users = new ArrayList<>();
 		personRepository.findAll().forEach(users::add);
 		
@@ -45,12 +64,12 @@ public class PersonController {
 	}
 	
 	@GetMapping("/register/{user_email}")
-	public boolean getUserByEmail(@PathVariable String user_email){
+	public Optional<Person> getUserByEmail(@PathVariable String user_email){
 		Optional<Person> user = personRepository.findByuserEmail(user_email);
 		if(user.isPresent())
-			return true;	
+			return user;	
 		else 
-			return false;
+			return null;
 	}
 	
 	@GetMapping("/user/{user_id}")
