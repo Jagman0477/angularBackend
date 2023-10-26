@@ -26,7 +26,7 @@ import ch.qos.logback.classic.Logger;
 import io.jsonwebtoken.Jwts;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("PERSON_SERVICE/api")
 public class LoginController {
 	
 	@Autowired

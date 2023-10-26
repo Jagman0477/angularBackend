@@ -34,9 +34,10 @@ public class WebSecurityConfig {
 	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity security) throws Exception {
 		return security.csrf().disable()
-				.authorizeHttpRequests().requestMatchers("/api/**").permitAll()
+				.authorizeHttpRequests().requestMatchers("PERSON_SERVICE/api/**").permitAll()
 				.and()
-				.authorizeHttpRequests().requestMatchers("/auth/**").authenticated()
+				
+				.authorizeHttpRequests().requestMatchers("PERSON_SERVICE/auth/**").authenticated()
 				.and()
 				.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
 				.and().addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class)

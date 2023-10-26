@@ -23,7 +23,7 @@ import com.jagman.model.Person;
 import com.jagman.repository.PersonRepository;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("PERSON_SERVICE/api")
 public class PersonController {
 	
 	@Autowired
