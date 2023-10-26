@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -19,8 +20,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.jagman.enumeration.Role;
 import com.jagman.model.Person;
 import com.jagman.repository.PersonRepository;
+
+import jakarta.annotation.security.RolesAllowed;
 
 @RestController
 @RequestMapping("PERSON_SERVICE/api")
@@ -37,7 +41,7 @@ public class PersonController {
 	@Autowired
 	PersonRepository personRepository;
 	
-	@PostMapping("/register")
+	@PostMapping("/register")	
 	public ResponseEntity<String> createNewPerson(@RequestBody Person person) {
 		
 		// Check if user exists
@@ -45,9 +49,16 @@ public class PersonController {
 			
 			// Hash user password
 			String hashPassword = bCryptPasswordEncoder.encode(person.getUserPassword());
-			person.setUserPassword(hashPassword);
 			
-			personRepository.save(person);
+			var personTemp = Person.builder()
+					.userAge(person.getUserAge())
+					.userEmail(person.getUserEmail())
+					.userName(person.getUsername())
+					.userPassword(hashPassword)
+					.userRole(Role.USER)
+					.build();
+			
+			personRepository.save(personTemp);
 			return ResponseEntity.status(HttpStatus.CREATED).body("User created -> true");
 		}
 		
@@ -55,6 +66,7 @@ public class PersonController {
 	}
 	
 	@GetMapping("/register")
+	@PreAuthorize("hasAuthority('ROLE_USER')")
 	public ResponseEntity<List<Person>> getAllUsers(){
 		System.out.println();
 		List<Person> users = new ArrayList<>();

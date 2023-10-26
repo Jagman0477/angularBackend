@@ -58,17 +58,15 @@ public class LoginController {
 			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
 		}
 		
-		Optional<Person> userDetails;
-		
 		try {
-			userDetails = personRepository.findByuserEmail(login.getUserEmail());
+			
+			var userDetails = personRepository.findByuserEmail(login.getUserEmail());
+			String jwt = jwtHelper.generateToken(userDetails.get().getUserEmail());
+			return ResponseEntity.ok(jwt);
+			
 		} catch (UsernameNotFoundException e) {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
 		}
-		
-		String jwt = jwtHelper.generateToken(userDetails.get().getUserEmail());
-		
-		return ResponseEntity.ok(jwt);
 		
 	}
 	
