@@ -88,7 +88,7 @@ public class Person implements UserDetails {
 
 	@Override
 	public String getUsername() {
-		return this.userName;
+		return this.userEmail;
 	}
 	
 }

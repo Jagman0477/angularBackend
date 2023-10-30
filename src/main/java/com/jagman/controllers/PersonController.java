@@ -65,8 +65,7 @@ public class PersonController {
 		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User created -> false");
 	}
 	
-	@GetMapping("/register")
-	@PreAuthorize("hasAuthority('ROLE_USER')")
+	@GetMapping("/getRegisters")	
 	public ResponseEntity<List<Person>> getAllUsers(){
 		System.out.println();
 		List<Person> users = new ArrayList<>();
