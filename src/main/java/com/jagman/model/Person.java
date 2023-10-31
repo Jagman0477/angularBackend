@@ -54,7 +54,7 @@ public class Person implements UserDetails {
     private int userAge;
 	
 	@Column(name = "gender")
-    private String gender;
+    private String userGender;
 
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
